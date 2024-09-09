@@ -26,13 +26,20 @@ public class CameraController : MonoBehaviour {
     }
 
     void Update() {
-        HandleCameraRotation();
+        
     }
 
-    void LateUpdate() {
+    void FixedUpdate()
+    {
+        HandleCameraRotation();
+
         Vector3 desiredPosition = CalculateDesiredCameraPosition();
         desiredPosition = HandleCameraCollision(desiredPosition);
         MoveCamera(desiredPosition);
+    }
+
+    void LateUpdate() {
+        
     }
 
 
@@ -40,8 +47,8 @@ public class CameraController : MonoBehaviour {
     // 카메라 회전 처리
     private void HandleCameraRotation() {
         // 마우스 입력을 받아 카메라 회전 계산
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * 0.01f;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * 0.01f;
 
         xRotation -= mouseY;  // 상하 회전
         yRotation += mouseX;  // 좌우 회전
@@ -49,15 +56,15 @@ public class CameraController : MonoBehaviour {
 
         // A와 D 키로 카메라의 y축 회전값을 추가로 조정
         if (Input.GetKey(KeyCode.A)) {
-            yRotation -= mouseSensitivity * Time.deltaTime; // 왼쪽 회전
+            yRotation -= mouseSensitivity * 0.01f; // 왼쪽 회전
         }
         if (Input.GetKey(KeyCode.D)) {
-            yRotation += mouseSensitivity * Time.deltaTime; // 오른쪽 회전
+            yRotation += mouseSensitivity * 0.01f; // 오른쪽 회전
         }
 
         // 카메라의 회전을 Slerp로 부드럽게 적용
         Quaternion targetRotation = Quaternion.Euler(xRotation, yRotation, 0.0f);
-        transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation, Time.deltaTime * CameraSpeed);
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation, 0.01f * CameraSpeed);
     }
 
     // 카메라가 목표로 하는 위치 계산
@@ -81,6 +88,6 @@ public class CameraController : MonoBehaviour {
     // 카메라 이동 처리
     private void MoveCamera(Vector3 desiredPosition) {
         // 카메라의 위치를 부드럽게 이동
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * CameraSpeed);
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, 0.01f * CameraSpeed);
     }
 }
