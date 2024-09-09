@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
     public GameObject Target;               // 카메라가 따라다닐 타겟
+    private Vector3 currentVelocity;  // 카메라의 현재 속도를 저장할 변수
 
     public float offsetX = 0.0f;            // 타깃 기준 카메라의 x좌표
     public float offsetY = 10.0f;           // 타깃 기준 카메라의 y좌표
@@ -54,8 +55,9 @@ public class CameraController : MonoBehaviour {
             yRotation += mouseSensitivity * Time.deltaTime; // 오른쪽 회전
         }
 
-        // 카메라의 회전을 적용
-        transform.localRotation = Quaternion.Euler(xRotation, yRotation, 0.0f);  // 회전 적용 함수
+        // 카메라의 회전을 Slerp로 부드럽게 적용
+        Quaternion targetRotation = Quaternion.Euler(xRotation, yRotation, 0.0f);
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation, Time.deltaTime * CameraSpeed);
     }
 
     // 카메라가 목표로 하는 위치 계산
