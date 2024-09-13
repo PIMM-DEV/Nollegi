@@ -20,18 +20,21 @@ public class NollegiMoveController : MonoBehaviour {
     void Start() {
         Initialize();
     }
+    void FixedUpdate()
+    {
+        HandleMovement();
+        HandleBobbingEffect();
+    }
 
     void Update() {
         HandleRotation();
-        HandleMovement();
-        HandleBobbingEffect();
     }
 
     // 초기화 메소드
     private void Initialize() {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;               // 물고기는 물 속에 있으므로 중력을 사용하지 않음
-        initialRotationOffset = Quaternion.Euler(0, 90, 0);  // 초기 회전 보정 값
+        initialRotationOffset = Quaternion.Euler(0, 0, 0);  // 초기 회전 보정 값
     }
 
     // 물고기 회전 처리 메소드
@@ -86,14 +89,14 @@ public class NollegiMoveController : MonoBehaviour {
 
     // 이동 속도를 적용하는 메소드
     private void ApplyMovement(Vector3 moveDirection) {
-        rb.velocity = Vector3.Lerp(rb.velocity, moveDirection, smoothness * Time.deltaTime);
+        rb.velocity = Vector3.Lerp(rb.velocity, moveDirection, smoothness * 0.01f);
         lastMoveDirection = moveDirection;   // 마지막 이동 방향 저장
         isBobbing = false;                   // 이동 중이므로 둥실둥실 상태 비활성화
     }
 
     // 미끄러지는 효과를 적용하는 메소드
     private void ApplySlidingEffect() {
-        rb.velocity = Vector3.Lerp(rb.velocity, lastMoveDirection * 0.1f, smoothness * Time.deltaTime);
+        rb.velocity = Vector3.Lerp(rb.velocity, lastMoveDirection * 0.1f, smoothness * 0.01f);
 
         // 속도가 거의 0이 되면 둥실둥실 효과 활성화
         if (rb.velocity.magnitude < 0.1f) {
@@ -104,9 +107,9 @@ public class NollegiMoveController : MonoBehaviour {
     // 둥실둥실 떠 있는 효과 처리 메소드
     private void HandleBobbingEffect() {
         if (isBobbing) {
-            bobbingTime += Time.deltaTime * bobbingSpeed;
+            bobbingTime += 0.01f * bobbingSpeed;
             Vector3 bobbing = new Vector3(0, Mathf.Sin(bobbingTime) * bobbingAmount, 0);
-            transform.position += bobbing * Time.deltaTime;
+            transform.position += bobbing * 0.01f;
         }
     }
 }
