@@ -38,38 +38,42 @@ public class ParasiteManager : MonoBehaviour
     }
 
     // 기생충 생성 및 물고기 표면에 부착
-    void SpawnParasites()
+void SpawnParasites()
+{
+    if (fishMesh == null)
     {
-        if (fishMesh == null)
+        Debug.LogError("물고기 Mesh가 없습니다.");
+        return;
+    }
+
+    // 물고기의 크기를 Mesh bounds를 통해 가져옴
+    float fishSurfaceArea = fishMesh.bounds.size.x * fishMesh.bounds.size.y * fishMesh.bounds.size.z;
+
+    // 기생충 수 결정 (곱하는 비율을 줄이고, 상한선을 설정)
+    int parasiteCount = Mathf.Clamp(Mathf.RoundToInt(fishSurfaceArea * 0.3f), minParasiteCount, maxParasiteCount);
+
+    for (int i = 0; i < parasiteCount; i++)
+    {
+        // 물고기 Mesh에서 임의의 표면 위치를 계산
+        Vector3 spawnPosition = GetRandomSurfacePointOnFish();
+
+        if (spawnPosition != Vector3.zero)
         {
-            Debug.LogError("물고기 Mesh가 없습니다.");
-            return;
+            // 기생충 프리팹 생성
+            GameObject parasite = Instantiate(parasitePrefab, spawnPosition, Quaternion.identity);
+
+            // 기생충을 물고기 표면에 부착
+            parasite.transform.SetParent(Fish.transform);  // 물고기의 자식으로 설정하여 고정
+
+            // 기생충 리스트에 추가
+            parasites.Add(parasite);
         }
-
-        int parasiteCount = Random.Range(minParasiteCount, maxParasiteCount);  // 랜덤한 기생충 수 생성
-
-        for (int i = 0; i < parasiteCount; i++)
+        else
         {
-            // 물고기 Mesh에서 임의의 표면 위치를 계산
-            Vector3 spawnPosition = GetRandomSurfacePointOnFish();
-
-            if (spawnPosition != Vector3.zero)
-            {
-                // 기생충 프리팹 생성
-                GameObject parasite = Instantiate(parasitePrefab, spawnPosition, Quaternion.identity);
-
-                // 기생충을 물고기 표면에 부착
-                parasite.transform.SetParent(Fish.transform);  // 물고기의 자식으로 설정하여 고정
-
-                // 기생충 리스트에 추가
-                parasites.Add(parasite);
-            }
-            else
-            {
-                Debug.LogWarning("물고기 표면을 찾지 못했습니다.");
-            }
+            Debug.LogWarning("물고기 표면을 찾지 못했습니다.");
         }
     }
+}
 
     // 물고기의 Mesh에서 임의의 표면 위치 찾기
     Vector3 GetRandomSurfacePointOnFish()
